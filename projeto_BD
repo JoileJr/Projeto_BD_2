@@ -1,0 +1,211 @@
+DROP DATABASE IF EXISTS aula_banco; 
+CREATE DATABASE aula_banco;	
+USE aula_banco;	
+
+CREATE TABLE estado(
+id INT NOT NULL UNIQUE AUTO_INCREMENT
+,nome VARCHAR(200) NOT NULL UNIQUE
+,sigla CHAR(2) NOT NULL UNIQUE
+,ativo ENUM('S','N') NOT NULL DEFAULT 'S'
+,data_cadastro DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+,CONSTRAINT pk_estado PRIMARY KEY (id)
+);
+
+CREATE TABLE cidade(
+id INT NOT NULL UNIQUE AUTO_INCREMENT
+,nome VARCHAR(200) NOT NULL 
+,ativo ENUM('S','N') NOT NULL DEFAULT 'S'
+,data_cadastro DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+,estado_id INT NOT NULL
+,CONSTRAINT pk_cidade PRIMARY KEY (id)
+,CONSTRAINT fk_cidade_estado FOREIGN KEY (estado_id) REFERENCES estado (id)
+,CONSTRAINT cidade_unica UNIQUE(nome, estado_id)
+);
+
+CREATE TABLE contato(
+id INT NOT NULL UNIQUE AUTO_INCREMENT
+,numero VARCHAR(20) NOT NULL 
+,email VARCHAR(200) NOT NULL 
+,geral VARCHAR(220) AS (CONCAT(numero,'-',email))
+,ativo ENUM('S','N') NOT NULL DEFAULT 'S'
+,CONSTRAINT pk_contato PRIMARY KEY (id)
+);
+
+CREATE TABLE funcionario(
+id INT NOT NULL UNIQUE AUTO_INCREMENT 
+,nome VARCHAR(200) NOT NULL UNIQUE 
+,cpf CHAR(11) NOT NULL UNIQUE 
+,salario DECIMAL NOT NULL
+,ativo ENUM('S','N') NOT NULL DEFAULT 'S'
+,contato_id INT NOT NULL 
+,cidade_id INT NOT NULL 
+,CONSTRAINT pk_funcionario PRIMARY KEY (id)
+,CONSTRAINT fk_funcionario_contato FOREIGN KEY (contato_id) REFERENCES contato (id)
+,CONSTRAINT fk_funcionario_cidade FOREIGN KEY (cidade_id) REFERENCES cidade (id)
+);
+
+CREATE TABLE cliente(
+id INT NOT NULL AUTO_INCREMENT 
+,nome VARCHAR(200) NOT NULL UNIQUE 
+,cpf CHAR(11) NOT NULL UNIQUE 
+,ativo VARCHAR(1) NOT NULL DEFAULT 'A'
+,contato_id INT NOT NULL 
+,data_cadastro  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+,CONSTRAINT pk_cliente PRIMARY KEY (id)
+,CONSTRAINT fk_cliente_contato FOREIGN KEY (contato_id) REFERENCES contato (id)
+);
+
+CREATE TABLE produto(
+id INT NOT NULL AUTO_INCREMENT 
+,categoria ENUM('Calça','Camiseta','Shorts','Meias')
+,tamanho ENUM('P','M','G','GG')
+,cor VARCHAR(200)
+,tipo VARCHAR(200) 
+,descrição VARCHAR(1300) AS (CONCAT(categoria,'-',tipo,'-',tamanho,'-',cor))
+,quantidade INT NOT NULL 
+,preço_compra DECIMAL(10,2) NOT NULL  
+,CONSTRAINT pk_produto PRIMARY KEY (id)
+);
+
+CREATE TABLE peças_vendidas(
+id INT NOT NULL AUTO_INCREMENT 
+,quantidade INT NOT NULL
+,valor DECIMAL NOT NULL 
+,produto_id INT NOT NULL
+,CONSTRAINT pk_peças_vendidas PRIMARY KEY (id)
+,CONSTRAINT fk_produto_peças_vendidas FOREIGN KEY (produto_id) REFERENCES produto (id)
+);
+
+CREATE TABLE venda(
+id INT NOT NULL AUTO_INCREMENT UNIQUE 
+,valor_total DECIMAL NOT NULL 
+,cliente_id INT NOT NULL 
+,peças_vendidas_id INT NOT NULL
+,CONSTRAINT pk_venda PRIMARY KEY (id)
+,CONSTRAINT fk_peças_vendidas FOREIGN KEY (peças_vendidas_id) REFERENCES peças_vendidas (id)
+,CONSTRAINT fk_cliente FOREIGN KEY (cliente_id) REFERENCES cliente (id)
+);
+
+CREATE TABLE recebimento(
+id INT NOT NULL AUTO_INCREMENT UNIQUE 
+,valor DECIMAL(10,2) NOT NULL
+,cliente_id INT NOT NULL
+,venda_id INT NOT NULL 
+,CONSTRAINT pk_recebimento PRIMARY KEY (id)
+,CONSTRAINT fk_recebimento_cliente FOREIGN KEY (cliente_id) REFERENCES cliente (id) 
+,CONSTRAINT fk_recebimento_venda FOREIGN KEY (venda_id) REFERENCES venda (id)
+);
+
+CREATE TABLE fornecedor(
+id INT NOT NULL AUTO_INCREMENT UNIQUE
+,nome VARCHAR(200) NOT NULL 
+,cnpj CHAR(18) NOT NULL UNIQUE 
+,contato_id INT NOT NULL 
+,cidade_id INT NOT NULL 
+,CONSTRAINT pk_fornecedor PRIMARY KEY (id)
+,CONSTRAINT fk_fornecedor_contato FOREIGN KEY (contato_id) REFERENCES contato (id)
+,CONSTRAINT fk_fornecedor_cidade FOREIGN KEY (cidade_id) REFERENCES cidade (id)
+);
+
+CREATE TABLE peças_compradas(
+id INT NOT NULL AUTO_INCREMENT 
+,quantidade INT NOT NULL
+,valor_pago DECIMAL NOT NULL 
+,produto_id INT NOT NULL
+,CONSTRAINT pk_peças_compradas PRIMARY KEY (id)
+,CONSTRAINT fk_peças_compradas_produto FOREIGN KEY (produto_id) REFERENCES produto (id)
+);
+
+CREATE TABLE compra(
+id INT NOT NULL AUTO_INCREMENT UNIQUE  
+,total_da_compra DECIMAL NOT NULL 
+,fornecedor_id INT NOT NULL
+,peças_compradas_id INT NOT NULL 
+,CONSTRAINT pk_compra PRIMARY KEY (id)
+,CONSTRAINT fk_compra_fornecedor FOREIGN KEY (fornecedor_id) REFERENCES fornecedor (id) 
+,CONSTRAINT fk_compra_peças_compradas FOREIGN KEY (peças_compradas_id) REFERENCES peças_compradas (id) 
+);
+
+CREATE TABLE pagamento(
+id INT NOT NULL AUTO_INCREMENT UNIQUE 
+,valor DECIMAL(10,2) NOT NULL
+,fornecedor_id INT NOT NULL
+,compra_id INT NOT NULL 
+,dataa  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+,CONSTRAINT pk_recebimento PRIMARY KEY (id)
+,CONSTRAINT fk_pagamento_fornecedor FOREIGN KEY (fornecedor_id) REFERENCES fornecedor (id) 
+,CONSTRAINT fk_pagamento_compra FOREIGN KEY (compra_id) REFERENCES compra (id) 
+);
+
+CREATE TABLE caixa(
+id INT NOT NULL UNIQUE AUTO_INCREMENT 
+,data_ DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+,saldo DECIMAL NOT NULL 
+,funcionario_id INT NOT NULL 
+,CONSTRAINT pk_caixa PRIMARY KEY (id)
+,CONSTRAINT fk_caixa_funcionario FOREIGN KEY (funcionario_id) REFERENCES funcionario (id) 
+);
+
+CREATE TABLE item_de_caixa(
+id INT NOT NULL UNIQUE AUTO_INCREMENT 
+,valor DECIMAL NOT NULL 
+,hora  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP 
+,caixa_id INT NOT NULL 
+,pagamento_id INT NOT NULL
+,recebimento_id INT NOT NULL 
+,CONSTRAINT pk_item_de_caixa PRIMARY KEY (id) 
+,CONSTRAINT fk_item_de_caixa_caixa_id FOREIGN KEY (caixa_id) REFERENCES caixa (id) 
+,CONSTRAINT fk_item_de_caixa_pagamento_id FOREIGN KEY (pagamento_id) REFERENCES pagamento (id) 
+,CONSTRAINT fk_item_de_caixa_recebimento_id FOREIGN KEY (recebimento_id) REFERENCES recebimento (id) 
+);
+
+INSERT INTO estado (id,nome,sigla,ativo, data_cadastro) VALUES (1,'SÃO PAULO','SP','S','2016-10-31');
+INSERT INTO estado (id,nome,sigla,ativo, data_cadastro) VALUES (2,'PARANÁ','PR','S','2015-2-25');
+INSERT INTO estado (id,nome,sigla,ativo, data_cadastro) VALUES (3,'MATO GROSSO','MT','N','2015-12-02');
+
+INSERT INTO cidade (nome, estado_id) VALUES ('BAURU',1);
+INSERT INTO cidade (nome, estado_id) VALUES ('MÁRINGA', 2);
+INSERT INTO cidade (nome, estado_id) VALUES ('BARRA DOS GARÇAS',3);
+
+INSERT INTO contato (id, numero, email) VALUES (1,'999801213', 'João@Gmail.com');
+INSERT INTO contato (id, numero, email) VALUES (2,'997089076', 'Maria@bol.com');
+INSERT INTO contato (id, numero, email) VALUES (3,'989007675', 'José@hotmail.com');
+
+INSERT INTO funcionario (id, nome, cpf, salario, contato_id, cidade_id) VALUES (1, 'JOÃO','11111111111', 1550.00, 3, 1);
+INSERT INTO funcionario (id, nome, cpf, salario, contato_id, cidade_id) VALUES (2, 'MARIA','22222222222', 2100.00, 2, 2);
+INSERT INTO funcionario (id, nome, cpf, salario, contato_id, cidade_id) VALUES (3, 'JOSÉ','01212021021', 3000.00, 1, 3);
+
+INSERT INTO produto (id, categoria, tamanho, cor, tipo, quantidade, preço_compra) VALUES (1,'Calça','G','Beje','Cargo',5,70.00);   
+INSERT INTO produto (id, categoria, tamanho, cor, tipo, quantidade, preço_compra) VALUES (2,'Calça','M','Azul','Jeans',5,60.00); 
+INSERT INTO produto (id, categoria, tamanho, cor, tipo, quantidade, preço_compra) VALUES (3,'Camiseta','G','Preto','Oversize',5,50.00);
+INSERT INTO produto (id, categoria, tamanho, cor, tipo, quantidade, preço_compra) VALUES (4,'Camiseta','M','Branco','Casual',5,40.00);
+
+-- 2 colunas virtuais criadas na tabela produto e uma em contato
+-- função para checar os dois tipos de contato da tabela email e telefone
+DELIMITER //
+CREATE FUNCTION buscar_contato (id_contato INT)
+RETURNS CHAR(220) DETERMINISTIC
+BEGIN
+	DECLARE resultado CHAR(220); 
+    SELECT geral INTO resultado FROM contato c WHERE c.id = id_contato;
+    RETURN resultado;
+END;
+//
+DELIMITER ;
+
+-- VALOR DE REVENDA CONFORME QUANTIDADE
+DELIMITER // 
+CREATE FUNCTION valor_de_revenda ( preço_compra DECIMAL(10,2), quantidade INT)
+RETURNS DECIMAL(10,2) DETERMINISTIC
+BEGIN
+		DECLARE valor_venda DECIMAL(10,2);
+		IF quantidade <= 10 THEN
+			SET valor_venda = preço_compra * 2;
+		ELSE 
+			SET valor_venda = preço_compra * 1.75;
+        END IF;
+        RETURN valor_venda;
+END;
+//
+DELIMITER ;
+
