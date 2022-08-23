@@ -209,3 +209,6 @@ END;
 //
 DELIMITER ;
 
+-- Fazer função para validar tipo de roupa que vende mais em determinado epoca do ano
+-- função pra validar dados repetidos
+-- criar uma nova tabela pra categoria
