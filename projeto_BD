@@ -34,8 +34,9 @@ id INT NOT NULL UNIQUE AUTO_INCREMENT
 CREATE TABLE funcionario(
 id INT NOT NULL UNIQUE AUTO_INCREMENT 
 ,nome VARCHAR(200) NOT NULL UNIQUE 
-,cpf CHAR(11) NOT NULL UNIQUE 
+,cpf VARCHAR(11) NOT NULL UNIQUE 
 ,salario DECIMAL NOT NULL
+,data_cadastro DATE NOT NULL
 ,ativo ENUM('S','N') NOT NULL DEFAULT 'S'
 ,contato_id INT NOT NULL 
 ,cidade_id INT NOT NULL 
@@ -171,9 +172,9 @@ INSERT INTO contato (id, numero, email) VALUES (1,'999801213', 'João@Gmail.com'
 INSERT INTO contato (id, numero, email) VALUES (2,'997089076', 'Maria@bol.com');
 INSERT INTO contato (id, numero, email) VALUES (3,'989007675', 'José@hotmail.com');
 
-INSERT INTO funcionario (id, nome, cpf, salario, contato_id, cidade_id) VALUES (1, 'JOÃO','11111111111', 1550.00, 3, 1);
-INSERT INTO funcionario (id, nome, cpf, salario, contato_id, cidade_id) VALUES (2, 'MARIA','22222222222', 2100.00, 2, 2);
-INSERT INTO funcionario (id, nome, cpf, salario, contato_id, cidade_id) VALUES (3, 'JOSÉ','01212021021', 3000.00, 1, 3);
+INSERT INTO funcionario (id, nome, cpf, salario, contato_id, cidade_id) VALUES (1, 'JOÃO','11111111111', 1550.00, '2019-03-10', 3, 1);
+INSERT INTO funcionario (id, nome, cpf, salario, contato_id, cidade_id) VALUES (2, 'MARIA','22222222222', 2100.00, '2020-10-23', 2, 2);
+INSERT INTO funcionario (id, nome, cpf, salario, contato_id, cidade_id) VALUES (3, 'JOSÉ','01212021021', 3000.00, '2020-11-20', 1, 3);
 
 INSERT INTO produto (id, categoria, tamanho, cor, tipo, quantidade, preço_compra) VALUES (1,'Calça','G','Beje','Cargo',5,70.00);   
 INSERT INTO produto (id, categoria, tamanho, cor, tipo, quantidade, preço_compra) VALUES (2,'Calça','M','Azul','Jeans',5,60.00); 
@@ -181,14 +182,18 @@ INSERT INTO produto (id, categoria, tamanho, cor, tipo, quantidade, preço_compr
 INSERT INTO produto (id, categoria, tamanho, cor, tipo, quantidade, preço_compra) VALUES (4,'Camiseta','M','Branco','Casual',5,40.00);
 
 -- 2 colunas virtuais criadas na tabela produto e uma em contato
--- função para checar os dois tipos de contato da tabela email e telefone
+-- função para checar se oo cpf ja existe
 DELIMITER //
-CREATE FUNCTION buscar_contato (id_contato INT)
-RETURNS CHAR(220) DETERMINISTIC
-BEGIN
-	DECLARE resultado CHAR(220); 
-    SELECT geral INTO resultado FROM contato c WHERE c.id = id_contato;
-    RETURN resultado;
+CREATE FUNCTION buscar_cpf_existentes (cpf VARCHAR(11))
+RETURNS BOOL 
+BEGIN 
+    DECLARE existente BOOL DEFAULT FALSE;
+    meu_loop : LOOP
+		IF cpf = (SELECT f.cpf FROM funcionario f) THEN
+			SET existente = TRUE;
+        END IF;
+	END LOOP meu_loop;
+    RETURN existente;
 END;
 //
 DELIMITER ;
@@ -200,7 +205,7 @@ RETURNS DECIMAL(10,2) DETERMINISTIC
 BEGIN
 		DECLARE valor_venda DECIMAL(10,2);
 		IF quantidade <= 10 THEN
-			SET valor_venda = preço_compra * 2;
+			SET valor_venda = preço_compra * 2.25;
 		ELSE 
 			SET valor_venda = preço_compra * 1.75;
         END IF;
@@ -209,6 +214,15 @@ END;
 //
 DELIMITER ;
 
--- Fazer função para validar tipo de roupa que vende mais em determinado epoca do ano
--- função pra validar dados repetidos
--- criar uma nova tabela pra categoria
+DELIMITER //
+CREATE FUNCTION funcionariosApos(data_contratação DATE)
+RETURNS DATE DETERMINISTIC
+BEGIN
+RETURN (SELECT *
+        FROM  funcionario f
+        WHERE data_cadastro >= data_contratação);
+RETURN DATE;
+END
+//
+DELIMITER ; 
+
