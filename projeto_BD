@@ -182,21 +182,6 @@ INSERT INTO produto (id, categoria, tamanho, cor, tipo, quantidade, preço_compr
 INSERT INTO produto (id, categoria, tamanho, cor, tipo, quantidade, preço_compra) VALUES (4,'Camiseta','M','Branco','Casual',5,40.00);
 
 -- 2 colunas virtuais criadas na tabela produto e uma em contato
--- função para checar se oo cpf ja existe
-DELIMITER //
-CREATE FUNCTION buscar_cpf_existentes (cpf VARCHAR(11))
-RETURNS BOOL 
-BEGIN 
-    DECLARE existente BOOL DEFAULT FALSE;
-    meu_loop : LOOP
-		IF cpf = (SELECT f.cpf FROM funcionario f) THEN
-			SET existente = TRUE;
-        END IF;
-	END LOOP meu_loop;
-    RETURN existente;
-END;
-//
-DELIMITER ;
 
 -- VALOR DE REVENDA CONFORME QUANTIDADE
 DELIMITER // 
@@ -226,3 +211,16 @@ END
 //
 DELIMITER ; 
 
+DELIMITER //
+CREATE FUNCTION tempo_servico(data_inicio DATE) 
+RETURNS INT
+DETERMINISTIC
+BEGIN
+    DECLARE data_atual DATE;
+    SELECT CURRENT_DATE()INTO data_atual;
+    RETURN YEAR(data_atual)-YEAR(data_inicio);
+END 
+//
+DELIMITER ;
+
+select id, nome, tempo_servico(data_cadastro) FROM funcionario;
