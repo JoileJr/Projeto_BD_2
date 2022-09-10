@@ -54,6 +54,7 @@ id INT NOT NULL UNIQUE AUTO_INCREMENT
 ,nome VARCHAR(200) NOT NULL UNIQUE 
 ,cpf VARCHAR(11) NOT NULL UNIQUE 
 ,salario DECIMAL NOT NULL
+,desempenho INT NOT NULL
 ,data_cadastro DATE NOT NULL
 ,ativo ENUM('S','N') NOT NULL DEFAULT 'S'
 ,contato_id INT NOT NULL 
@@ -63,9 +64,9 @@ id INT NOT NULL UNIQUE AUTO_INCREMENT
 ,CONSTRAINT fk_funcionario_cidade FOREIGN KEY (cidade_id) REFERENCES cidade (id)
 );
 
-INSERT INTO funcionario (id, nome, cpf, salario, data_cadastro, contato_id, cidade_id) VALUES (1, 'JOÃO','11111111111', 1550.00, '2021-03-10', 3, 1);
-INSERT INTO funcionario (id, nome, cpf, salario, data_cadastro, contato_id, cidade_id) VALUES (2, 'MARIA','22222222222', 2100.00, '2021-10-23', 2, 2);
-INSERT INTO funcionario (id, nome, cpf, salario, data_cadastro, contato_id, cidade_id) VALUES (3, 'JOSÉ','01212021021', 3000.00, '2021-11-20', 1, 3);
+INSERT INTO funcionario (id, nome, cpf, salario, desempenho, data_cadastro, contato_id, cidade_id) VALUES (1, 'JOÃO','11111111111', 1550.00, 50, '2021-03-10', 3, 1);
+INSERT INTO funcionario (id, nome, cpf, salario, desempenho, data_cadastro, contato_id, cidade_id) VALUES (2, 'MARIA','22222222222', 2100.00, 70, '2021-10-23', 2, 2);
+INSERT INTO funcionario (id, nome, cpf, salario, desempenho, data_cadastro, contato_id, cidade_id) VALUES (3, 'JOSÉ','01212021021', 3000.00, 90, '2021-11-20', 1, 3);
 
 CREATE TABLE cliente(
 id INT NOT NULL AUTO_INCREMENT 
@@ -94,10 +95,10 @@ id INT NOT NULL AUTO_INCREMENT
 ,CONSTRAINT pk_produto PRIMARY KEY (id)
 );
 
-INSERT INTO produto (id, categoria, tamanho, cor, tipo, quantidade, preço_compra) VALUES (1,'Calça','G','Beje','Cargo',5,70.00);   
-INSERT INTO produto (id, categoria, tamanho, cor, tipo, quantidade, preço_compra) VALUES (2,'Calça','M','Azul','Jeans',5,60.00); 
-INSERT INTO produto (id, categoria, tamanho, cor, tipo, quantidade, preço_compra) VALUES (3,'Jaqueta','G','Preto','Couro',10,50.00);
-INSERT INTO produto (id, categoria, tamanho, cor, tipo, quantidade, preço_compra) VALUES (4,'Camiseta','M','Branco','Casual',5,40.00);
+INSERT INTO produto (id, categoria, tamanho, cor, tipo, quantidade, preço_compra) VALUES (1,'Calça','G','Beje','Cargo',10,70.00);   
+INSERT INTO produto (id, categoria, tamanho, cor, tipo, quantidade, preço_compra) VALUES (2,'Calça','M','Azul','Jeans',10,60.00); 
+INSERT INTO produto (id, categoria, tamanho, cor, tipo, quantidade, preço_compra) VALUES (3,'Jaqueta','G','Preto','Couro',10,80.00);
+INSERT INTO produto (id, categoria, tamanho, cor, tipo, quantidade, preço_compra) VALUES (4,'Camiseta','M','Branco','Casual',20,40.00);
 
 CREATE TABLE peças_vendidas(
 id INT NOT NULL AUTO_INCREMENT 
@@ -109,10 +110,9 @@ id INT NOT NULL AUTO_INCREMENT
 );
 
 INSERT INTO peças_vendidas(id, quantidade, valor, produto_id) VALUES (1, 1, 70*1.50, 1);
-INSERT INTO peças_vendidas(id, quantidade, valor, produto_id) VALUES (2, 1, 60*1.50, 2);
-INSERT INTO peças_vendidas(id, quantidade, valor, produto_id) VALUES (3, 1, 50*1.50, 3);
-INSERT INTO peças_vendidas(id, quantidade, valor, produto_id) VALUES (4, 1, 50*1.50, 3);
-INSERT INTO peças_vendidas(id, quantidade, valor, produto_id) VALUES (5, 1, 50*1.50, 3);
+INSERT INTO peças_vendidas(id, quantidade, valor, produto_id) VALUES (2, 3, 60*1.50, 2);
+INSERT INTO peças_vendidas(id, quantidade, valor, produto_id) VALUES (3, 10, 50*1.50, 3);
+INSERT INTO peças_vendidas(id, quantidade, valor, produto_id) VALUES (4, 1, 40*1.50, 4);
 
 CREATE TABLE venda(
 id INT NOT NULL AUTO_INCREMENT UNIQUE 
@@ -126,11 +126,11 @@ id INT NOT NULL AUTO_INCREMENT UNIQUE
 ,CONSTRAINT fk_cliente FOREIGN KEY (cliente_id) REFERENCES cliente (id)
 );
 
-INSERT INTO venda (id, valor_total, data_venda, estação, cliente_id, peças_vendidas_id) VALUES (1, 70*1.50, '2022-07-10', 'OUTONO', 1, 1);
-INSERT INTO venda (id, valor_total, data_venda, estação, cliente_id, peças_vendidas_id) VALUES (2, 60*1.50, '2022-01-10','VERÃO', 2, 2);
-INSERT INTO venda (id, valor_total, data_venda, estação, cliente_id, peças_vendidas_id) VALUES (3, 50*1.50, '2022-06-10','INVERNO', 3, 3);
-INSERT INTO venda (id, valor_total, data_venda, estação, cliente_id, peças_vendidas_id) VALUES (4, 70*1.50, '2022-06-05','INVERNO', 1, 3);
-INSERT INTO venda (id, valor_total, data_venda, estação, cliente_id, peças_vendidas_id) VALUES (5, 70*1.50, '2022-06-20','INVERNO', 1, 3);
+INSERT INTO venda (id, valor_total, data_venda, estação, cliente_id, peças_vendidas_id) VALUES (1, 70*1.50, '2022-07-10', 'VERÃO', 1, 1);
+INSERT INTO venda (id, valor_total, data_venda, estação, cliente_id, peças_vendidas_id) VALUES (2, 60*1.50, '2022-01-10', 'OUTONO', 2, 2);
+INSERT INTO venda (id, valor_total, data_venda, estação, cliente_id, peças_vendidas_id) VALUES (3, 80*1.50, '2022-06-10', 'INVERNO', 3, 3);
+INSERT INTO venda (id, valor_total, data_venda, estação, cliente_id, peças_vendidas_id) VALUES (4, 4*(80*1.50), '2022-06-05', 'INVERNO', 1, 3);
+INSERT INTO venda (id, valor_total, data_venda, estação, cliente_id, peças_vendidas_id) VALUES (5, 5*(80*1.50), '2022-06-20', 'INVERNO', 1, 3);
 
 CREATE TABLE recebimento(
 id INT NOT NULL AUTO_INCREMENT UNIQUE 
@@ -145,7 +145,7 @@ id INT NOT NULL AUTO_INCREMENT UNIQUE
 
 INSERT INTO recebimento (id, valor, data_recebimento, cliente_id, venda_id) VALUES (1, 70*1.50, '2022-05-10', 1, 1);
 INSERT INTO recebimento (id, valor, data_recebimento, cliente_id, venda_id) VALUES (2, 60*1.50, '2022-01-10', 2, 2);
-INSERT INTO recebimento (id, valor, data_recebimento, cliente_id, venda_id) VALUES (3, 50*1.50, '2022-09-10', 3, 3);
+INSERT INTO recebimento (id, valor, data_recebimento, cliente_id, venda_id) VALUES (3, 80*1.50, '2022-09-10', 3, 3);
 
 CREATE TABLE fornecedor(
 id INT NOT NULL AUTO_INCREMENT UNIQUE
@@ -174,6 +174,7 @@ id INT NOT NULL AUTO_INCREMENT
 INSERT INTO peças_compradas (id, quantidade, valor_pago, produto_id) VALUES (1, 10, 70.00, 1);
 INSERT INTO peças_compradas (id, quantidade, valor_pago, produto_id) VALUES (2, 10, 60.00, 2);
 INSERT INTO peças_compradas (id, quantidade, valor_pago, produto_id) VALUES (3, 10, 50.00, 3);
+INSERT INTO peças_compradas (id, quantidade, valor_pago, produto_id) VALUES (4, 20, 40.00, 4);
 
 CREATE TABLE compra(
 id INT NOT NULL AUTO_INCREMENT UNIQUE  
@@ -188,6 +189,7 @@ id INT NOT NULL AUTO_INCREMENT UNIQUE
 INSERT INTO compra (id, total_da_compra, fornecedor_id, peças_compradas_id) VALUES (1, 70.00 * 10, 1, 1);
 INSERT INTO compra (id, total_da_compra, fornecedor_id, peças_compradas_id) VALUES (2, 60.00 * 10, 1, 2);
 INSERT INTO compra (id, total_da_compra, fornecedor_id, peças_compradas_id) VALUES (3, 50.00 * 10, 1, 3);
+INSERT INTO compra (id, total_da_compra, fornecedor_id, peças_compradas_id) VALUES (4, 40.00 * 10, 1, 4);
 
 CREATE TABLE pagamento(
 id INT NOT NULL AUTO_INCREMENT UNIQUE 
@@ -236,7 +238,6 @@ INSERT INTO item_de_caixa (id, valor, data_a, caixa_id, pagamento_id) VALUES (3,
 
 -- 2 colunas virtuais criadas na tabela produto e uma em contato
 
-/** função para verificar quantas vendas foram realizadas nessa data**/
 DELIMITER //
 CREATE FUNCTION vendas_realizadas_nessa_data (data_pesquisada DATETIME)
 RETURNS INT DETERMINISTIC 
@@ -264,22 +265,8 @@ END ;
 DELIMITER ;
 
 DELIMITER //
-CREATE FUNCTION produto_mais_vendido_por_estação (estação_busca VARCHAR(100))
-RETURNS VARCHAR(200) DETERMINISTIC
-BEGIN
-	DECLARE resultado VARCHAR(200);
-	DECLARE aux INT;
-	Select count(peças_vendidas.quantidade) INTO resultado from venda, peças_vendidas
-    where venda.estação = estação_busca AND peças_vendidas.id = venda.peças_vendidas_id;
-    
-    RETURN resultado ;
-END ;
-//
-DELIMITER ;
-
-DELIMITER //
 CREATE FUNCTION calcula_saldo ( entradas DECIMAL, saidas DECIMAL, id_caixa INT)
-RETURNS DECIMAL(9,0) DETERMINISTIC 
+RETURNS DECIMAL(9,2) DETERMINISTIC 
 BEGIN
 		DECLARE Retorno DECIMAL(9,2);
         DECLARE aux DECIMAL;
@@ -290,7 +277,56 @@ END ;
 //
 DELIMITER ;
 
+DELIMITER //
+CREATE FUNCTION produto_mais_vendido_por_estação (estação_busca VARCHAR(100))
+RETURNS VARCHAR(200) DETERMINISTIC
+BEGIN
+	DECLARE resultado VARCHAR(200);
+    DECLARE quantidade_vendida INT;
+    
+    SELECT MAX(peças_vendidas.quantidade) INTO quantidade_vendida FROM venda, peças_vendidas, produto
+	WHERE venda.peças_vendidas_id = peças_vendidas.id AND venda.estação = estação_busca;
+	
+    SELECT produto.descrição INTO resultado FROM peças_vendidas, produto
+    WHERE peças_vendidas.produto_id = produto.id AND peças_vendidas.quantidade = quantidade_vendida;
+  
+    RETURN resultado ;
+END ;
+//
+DELIMITER ;
+
+DELIMITER //
+CREATE FUNCTION situação_estoque ( codigo_produto INT)
+RETURNS VARCHAR(100) DETERMINISTIC 
+BEGIN
+		DECLARE Situação VARCHAR(100);
+        DECLARE Quantidade_ INT;
+        DECLARE Quantidade_vendida INT;
+        DECLARE Quantidade_atual INT;
+        
+        select produto.quantidade INTO Quantidade_ FROM produto 
+        Where produto.id = codigo_produto;
+       
+        select SUM(peças_vendidas.quantidade) INTO Quantidade_vendida FROM produto, peças_vendidas
+        WHERE peças_vendidas.produto_id = produto.id AND produto.id = codigo_produto;
+        
+        SET Quantidade_atual = Quantidade_ - Quantidade_vendida;
+        
+        IF Quantidade_atual >= 10 THEN
+			SET Situação = 'NÂO NECESSITA REPOSIÇÂO';
+		ELSEIF Quantidade_atual <= 10 AND Quantidade_atual >=1 THEN
+			SET Situação = 'PRECISA DE REPOSIÇÃO / URGENTE';
+		ELSE 
+			SET Situação = 'SEM ESTOQUE';
+        END IF;
+        
+        RETURN Situação;
+END ;
+//
+DELIMITER ;
+
+select id, descrição, situação_estoque(id) from produto;
+select produto_mais_vendido_por_estação('INVERNO');
 select calcula_saldo(500, 200, 1);
-select vendas_realizadas_nessa_data('2022-06-20');
-select produto.descrição from produto where id =  produto_mais_vendido_por_estação ('INVERNO');
 select valor_de_revenda(50, 10);
+select vendas_realizadas_nessa_data('2022-06-20');
