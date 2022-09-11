@@ -325,6 +325,34 @@ END ;
 //
 DELIMITER ;
 
+DELIMITER //
+CREATE FUNCTION  verificar_cpf ( cpf_busca VARCHAR(11) )
+RETURNS VARCHAR(200) DETERMINISTIC 
+BEGIN
+		DECLARE retorno VARCHAR(100);
+        DECLARE fim_loop int DEFAULT 0;
+        DECLARE cpf_comparar VARCHAR(11);
+		
+        DECLARE meu_cursor CURSOR FOR SELECT funcionario.cpf FROM funcionario;
+        DECLARE CONTINUE HANDLER FOR NOT FOUND SET fim_loop = 1;
+        
+        OPEN meu_cursor;
+        WHILE( fim_loop != 1 ) DO
+			FETCH meu_cursor INTO cpf_comparar;
+            IF cpf_busca != cpf_comparar THEN
+				SET retorno = 'DADO INEXISTENTE';
+            ELSE
+				SET retorno = 'CPF JÁ EXISTENTE';
+            END IF;
+            
+        END WHILE ;
+        
+        RETURN retorno;
+END ;
+//
+DELIMITER ;
+
+select verificar_cpf('22222222222');
 select id, descrição, situação_estoque(id) from produto;
 select produto_mais_vendido_por_estação('INVERNO');
 select calcula_saldo(500, 200, 1);
