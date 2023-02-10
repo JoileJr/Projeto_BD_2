@@ -14,6 +14,7 @@ id INT NOT NULL UNIQUE AUTO_INCREMENT
 INSERT INTO estado (id,nome,sigla,ativo, data_cadastro) VALUES (1,'SÃO PAULO','SP','S','2016-10-31');
 INSERT INTO estado (id,nome,sigla,ativo, data_cadastro) VALUES (2,'PARANÁ','PR','S','2015-2-25');
 INSERT INTO estado (id,nome,sigla,ativo, data_cadastro) VALUES (3,'MATO GROSSO','MT','N','2015-12-02');
+INSERT INTO estado (id,nome,sigla,ativo, data_cadastro) VALUES (3,'SANTA CATARINA','SC','S','2017-12-02');
 
 CREATE TABLE cidade(
 id INT NOT NULL UNIQUE AUTO_INCREMENT
